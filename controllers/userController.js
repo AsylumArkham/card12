@@ -57,38 +57,34 @@ const update = async (req, res) => {
         const isAdmin = (currentUser.role == 'admin');
         const changePassword = (password && newPassword);
         const sameUser = (currentUser._id == req.params.id);
+        let updatedOk = false;
 
-        const updates = {};
-        if (email) updates.email = email;
-        if (role) updates.role = role;
-        if (empresa) updates.empresa = empresa;
+        // change password
+        if ((isAdmin || sameUser) && (password && newPassword)) {
+            const isOk = userToUpdate.compare(password);
+            if (!isOk && !isAdmin) throw new Error('You must provide the old password');
+            const passwordHashed = await userToUpdate.hash(newPassword);
+            await User.findOneAndUpdate({ _id: req.userToUpdate._id }, { password: passwordHashed });
+            updatedOk = true;
+        }
 
-        if (isAdmin && sameUser) 
-
-
-        if (currentUser.role == 'admin') {
-
-            if (user._id == req.params.id) {
-                
-            } else {
-
+        // change other data
+        if (isAdmin) {
+            const updates = {};
+            if (email) updates.email = email;
+            if (role) updates.role = role;
+            if (empresa) updates.empresa = empresa;
+            if (Object.keys(updates).length > 0) {
+                await User.findOneAndUpdate({ _id: req.params.id}, updates);
+                updatedOk = true;
             }
+        }
 
-            
-
-
-            if (password && newPassword) {
-
-            }
-
+        // send results
+        if (updatedOk) {
+            res.send({ message: 'User updated' });
         } else {
-            // a normal user, only can change his password
-            if (!password && !newPassword) throw new Error('Not allowed to update user data');
-            const isOk = user.compare(password);
-            if (!isOk) throw new Error('You must provide the old password');
-            const passwordHashed = await user.hash(newPassword);
-            await User.findOneAndUpdate({ _id: req.currentUser }, { password: passwordHashed });
-            res.send({ message: 'Password changed' });
+            res.status(400).send({ message: 'Cant make changes'});
         }
     } catch(err) {
         res.status(400).send({ Error: err.message });
