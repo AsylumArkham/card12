@@ -28,9 +28,11 @@ const login = async (req, res) => {
 
 const readAll = async (req, res) => {
     try {
-        const user = await User.findById(req.currentUser);
-        if (!user) throw new Error('Not authenticated');
-        if (!user.role == 'admin') throw new Error('Not allowed');
+        // const user = await User.findById(req.currentUser);
+
+        // // if (!user) throw new Error('Not authenticated');
+        // if (!user) res.send({ users: [] });
+        // if (!user.role == 'admin') throw new Error('Not allowed');
         const users = await User.find().select('-password');
         res.send({ users });
     } catch (err) {
