@@ -8,10 +8,10 @@ const router = express.Router();
 // user
 router.post('/signup', user.create);
 router.post('/login', user.login);
-router.get('/users', auth, user.readAll);
+router.get('/users', user.readAll);
 router.get('/user/:id', auth, user.readOne);
 router.put('/user/:id', auth, user.update);
-router.delete('/user/:id', auth, user.delete);
+router.delete('/user/:id', auth, user.deleteOne);
 
 // card
 router.post('/card', auth, card.create);

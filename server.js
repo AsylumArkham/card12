@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
+const cors = require('cors');
 const { DB, OPTIONS } = require('./config');
 const routes = require('./routes');
 
@@ -12,6 +13,7 @@ mongoose.connect(DB, OPTIONS)
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use('/api', routes);
 

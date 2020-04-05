@@ -4,12 +4,12 @@ const { makeToken } = require('../middleware/auth');
 const create = async (req, res) => {
     try {
         const { email, password, role, empresa } = req.body;
-        if (!user || !password || !empresa) throw new Error('Cant create user');
+        if (!email || !password || !empresa) throw new Error('Cant create user');
         const newUser = new User(email, password, role, empresa);
         newUser.password = await newUser.hash();
         await newUser.save();
         res.send({ user: newUser });
-    } catch(err) {
+    } catch (err) {
         res.status(400).send({ Error: err.message });
     }
 };
@@ -21,7 +21,7 @@ const login = async (req, res) => {
         if (!user) throw new Error('User not found');
         if (!user.compare(password)) throw Error('Invalid password');
         res.send({ token: makeToken(user) });
-    } catch(err) {
+    } catch (err) {
         res.status(400).send({ Error: err.message });
     }
 };
@@ -29,10 +29,11 @@ const login = async (req, res) => {
 const readAll = async (req, res) => {
     try {
         const user = await User.findById(req.currentUser);
+        if (!user) throw new Error('Not authenticated');
         if (!user.role == 'admin') throw new Error('Not allowed');
         const users = await User.find().select('-password');
         res.send({ users });
-    } catch(err) {
+    } catch (err) {
         res.status(400).send({ Error: err.message });
     }
 };
@@ -42,7 +43,7 @@ const readOne = async (req, res) => {
         const user = await User.findById(req.params.id).select('-password');
         if (!user) throw new Error('User not found');
         res.send({ user });
-    } catch(err) {
+    } catch (err) {
         res.status(400).send({ Error: err.message });
     }
 };
@@ -75,7 +76,7 @@ const update = async (req, res) => {
             if (role) updates.role = role;
             if (empresa) updates.empresa = empresa;
             if (Object.keys(updates).length > 0) {
-                await User.findOneAndUpdate({ _id: req.params.id}, updates);
+                await User.findOneAndUpdate({ _id: req.params.id }, updates);
                 updatedOk = true;
             }
         }
@@ -84,9 +85,9 @@ const update = async (req, res) => {
         if (updatedOk) {
             res.send({ message: 'User updated' });
         } else {
-            res.status(400).send({ message: 'Cant make changes'});
+            res.status(400).send({ message: 'Cant make changes' });
         }
-    } catch(err) {
+    } catch (err) {
         res.status(400).send({ Error: err.message });
     }
 };
@@ -94,7 +95,7 @@ const update = async (req, res) => {
 const deleteOne = async (req, res) => {
     try {
         res.send({ users });
-    } catch(err) {
+    } catch (err) {
         res.status(400).send({ Error: err.message });
     }
 };
