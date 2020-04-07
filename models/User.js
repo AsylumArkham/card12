@@ -21,11 +21,11 @@ const userSchema = new mongoose.Schema({
     empresa: String
 });
 
-userSchema.methods.hash = async (p) => {
+userSchema.statics.hash = async (p) => {
     return await bcryptjs.hash(p, SALT);
 };
 
-userSchema.methods.compare = async function (p) {
+userSchema.statics.compare = async function (p) {
     return await bcryptjs.compare(p, this.password);
 }
 
