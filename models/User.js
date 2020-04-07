@@ -25,8 +25,8 @@ userSchema.statics.hash = async (p) => {
     return await bcryptjs.hash(p, SALT);
 };
 
-userSchema.statics.compare = async function (p) {
-    return await bcryptjs.compare(p, this.password);
+userSchema.statics.compare = async function (p, password) {
+    return await bcryptjs.compare(p, password);
 }
 
 module.exports = mongoose.model('User', userSchema);
